@@ -54,10 +54,30 @@ router.patch( '/:id', function( req, res, next ) {
   if ( Number.isNaN( id ) ) {
     return next();
   }
+
   knex( 'classifieds' )
     .where( 'id', id )
     .returning( [ 'id', 'title', 'description', 'price', 'item_image' ] )
     .update( req.body )
+    .then( ( data ) => {
+      res.send( data[ 0 ] )
+    } )
+    .catch( ( err => {
+      next( err );
+    } ) );
+} )
+
+router.delete( '/:id', function( req, res, next ) {
+  const id = Number.parseInt( req.params.id );
+
+  if ( Number.isNaN( id ) ) {
+    return next();
+  }
+
+  knex( 'classifieds' )
+    .where( 'id', id )
+    .returning( [ 'id', 'title', 'description', 'price', 'item_image' ] )
+    .del()
     .then( ( data ) => {
       res.send( data[ 0 ] )
     } )
