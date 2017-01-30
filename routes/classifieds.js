@@ -14,7 +14,8 @@ router.get( '/', function( req, res, next ) {
     .catch( ( err => {
       next( err );
     } ) );
-} )
+} );
+
 router.get( '/:id', function( req, res, next ) {
   const id = Number.parseInt( req.params.id );
 
@@ -28,6 +29,19 @@ router.get( '/:id', function( req, res, next ) {
         throw boom.create( 404, 'Not Found' );
       }
       res.send( data[ 0 ] );
+    } )
+    .catch( ( err => {
+      next( err );
+    } ) );
+} );
+
+router.post( '/', function( req, res, next ) {
+  const newAd = req.body;
+  knex( 'classifieds' )
+    .returning( [ 'id', 'title', 'description', 'price', 'item_image' ] )
+    .insert( newAd )
+    .then( ( data ) => {
+      res.send( data[ 0 ] )
     } )
     .catch( ( err => {
       next( err );
