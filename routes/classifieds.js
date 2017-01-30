@@ -1,10 +1,37 @@
-
 'use strict';
-
-const express = require('express');
-
+const boom = require( 'boom' );
+const express = require( 'express' );
+const knex = require( '../knex' );
 const router = express.Router();
 
-// YOUR CODE HERE
+router.get( '/', function( req, res, next ) {
+  knex.select( 'id', 'title', 'description', 'price', 'item_image' ).from( 'classifieds' )
+    .orderBy( 'id' )
+    .then( ( data ) => {
+      res.send( data );
+
+    } )
+    .catch( ( err => {
+      next( err );
+    } ) );
+} )
+router.get( '/:id', function( req, res, next ) {
+  const id = Number.parseInt( req.params.id );
+
+  if ( Number.isNaN( id ) ) {
+    return next();
+  }
+  knex.select( 'id', 'title', 'description', 'price', 'item_image' ).from( 'classifieds' )
+    .where( 'id', id )
+    .then( ( data ) => {
+      if ( !data ) {
+        throw boom.create( 404, 'Not Found' );
+      }
+      res.send( data[ 0 ] );
+    } )
+    .catch( ( err => {
+      next( err );
+    } ) );
+} )
 
 module.exports = router;
